@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Jumble Word Puzzle</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #283e51, #485563);
+      color: white;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    h1 { margin: 20px 0; }
+    .puzzle-box {
+      margin: 30px auto;
+      padding: 20px;
+      background: #1e2a38;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    }
+    #jumbled {
+      font-size: 28px;
+      font-weight: bold;
+      letter-spacing: 5px;
+      color: yellow;
+    }
+    input {
+      margin-top: 15px;
+      padding: 10px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      width: 70%;
+      text-align: center;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      border: none;
+      background: #4caf50;
+      color: white;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover { background: #388e3c; }
+    #message {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: bold;
+      color: orange;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔠 Jumble Word Puzzle</h1>
+  <p>Unscramble the word to reveal your next clue!</p>
+
+  <div class="puzzle-box">
+    <div id="jumbled"></div>
+    <input type="text" id="answer" placeholder="Enter your answer">
+    <br>
+    <button id="submitBtn">Submit</button>
+    <div id="message"></div>
+  </div>
+
+  <script>
+    // Word Bank
+    const words = [
+      { word: "sustainable", clue: "Where rules are written and files are tall, your clue hides within the hall.." },
+      // Add more words here as needed
+    ];
+
+    // Utility: normalize strings for case-insensitive comparison
+    const normalize = s => s.trim().toLowerCase().replace(/\s+/g, '');
+
+    // Fisher-Yates shuffle that avoids returning the same order (for words > 1 char)
+    function shuffleWord(word) {
+      if (word.length <= 1) return word;
+      const arr = word.split('');
+      let shuffled;
+      do {
+        let a = arr.slice();
+        for (let i = a.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [a[i], a[j]] = [a[j], a[i]];
+        }
+        shuffled = a.join('');
+      } while (normalize(shuffled) === normalize(word));
+      return shuffled;
+    }
+
+    // Pick a random word
+    let current = words[Math.floor(Math.random() * words.length)];
+    const jumbled = shuffleWord(current.word);
+    document.getElementById("jumbled").innerText = jumbled;
+
+    function checkAnswer() {
+      const userInput = document.getElementById("answer").value;
+      if (normalize(userInput) === normalize(current.word)) {
+        document.getElementById("message").innerHTML =
+          `✅ Correct! <br> 🔍 Clue: ${current.clue}`;
+        // Optionally disable input after correct
+        document.getElementById("answer").disabled = true;
+        document.getElementById("submitBtn").disabled = true;
+      } else {
+        document.getElementById("message").innerText = "❌ Wrong answer. Try again!";
+      }
+    }
+
+    // Hook up button and Enter key
+    document.getElementById("submitBtn").addEventListener("click", checkAnswer);
+    document.getElementById("answer").addEventListener("keyup", function(e) {
+      if (e.key === "Enter") checkAnswer();
+    });
+  </script>
+</body>
+</html>
